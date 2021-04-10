@@ -11,4 +11,4 @@ class stop: public guidance{
         
         int getTheOutput(); //return the output of sensor
         int stopTheRover(int); //return a value(PWM) to stop the rover if triggered(by certain color square)
-}
+};
