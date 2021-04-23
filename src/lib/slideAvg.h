@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <vector>
 #include "circBuf.h"
 
 template<typename T>
