@@ -2,6 +2,7 @@
 * pwm: class pwm driver
 * SdtElectronics 2021.3
 */
+
 #pragma once
 
 #include <errno.h>
@@ -10,14 +11,13 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
-#include <string>
 #include <stdexcept>
 #include <array>
 #include <charconv>
 
 class pwm{
   public:
-    pwm(const char* path);
+    pwm(const std::string& path);
 
     void dutyCycle(unsigned int duty);
     void frequency(unsigned int freq);
@@ -31,31 +31,20 @@ class pwm{
     
     static void exportPwm(const char* path, size_t id);
   private:
-    const std::string _path;
-    const std::string dPath;
-    const std::string fPath;
-    const std::string ePath;
+    const int dutyFd;
+    const int perdFd;
+    const int enFd;
     unsigned int period;
 };
 
 void pwm::highTnSec(unsigned int time){
-    int fd = open(dPath.c_str(), O_WRONLY);
-    if(fd < 0){
-        throw std::runtime_error(strerror(errno));
-    }
     std::array<char, 16> str;
     std::to_chars(str.data(), str.data() + str.size(), time);
-    write(fd, str.data(), 16);
-    close(fd);
+    write(dutyFd, str.data(), 16);
 }
 
 void pwm::perdTnSec(unsigned int perd){
-    int fd = open(fPath.c_str(), O_WRONLY);
-    if(fd < 0){
-        throw std::runtime_error(strerror(errno));
-    }
     std::array<char, 16> str;
     std::to_chars(str.data(), str.data() + str.size(), period);
-    write(fd, str.data(), 16);
-    close(fd);
+    write(period, str.data(), 16);
 }

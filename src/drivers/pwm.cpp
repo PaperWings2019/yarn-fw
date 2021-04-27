@@ -1,10 +1,13 @@
+#include <string>
 #include "pwm.h"
 
-pwm::pwm(const char* path): _path(path),
-                            dPath(_path + "/duty_cycle"),
-                            fPath(_path + "/period"),
-                            ePath(_path + "enable"){
-    
+pwm::pwm(const std::string& path): 
+    dutyFd(open((path + "duty_cycle ").c_str(), O_WRONLY)),
+    perdFd(open((path + "period").c_str(), O_WRONLY)),
+    enFd  (open((path + "enable").c_str(), O_WRONLY)){
+    if(dutyFd < 0 || perdFd < 0 || enFd < 0){
+        throw std::runtime_error(strerror(errno));
+    }
 }
 
 void pwm::dutyCycle(unsigned int duty){
@@ -18,23 +21,17 @@ void pwm::frequency(unsigned int freq){
 }
 
 void pwm::enable(){
-    int fd = open(ePath.c_str(), O_WRONLY);
-    if(fd < 0){
-        throw std::runtime_error(strerror(errno));
-    }
-    write(fd, "1", 2);
+    write(enFd, "1", 2);
 }
 
 void pwm::disable(){
-    int fd = open(ePath.c_str(), O_WRONLY);
-    if(fd < 0){
-        throw std::runtime_error(strerror(errno));
-    }
-    write(fd, "0", 2);
+    write(enFd, "0", 2);
 }
 
 pwm::~pwm(){
-
+    close(dutyFd);
+    close(perdFd);
+    close(enFd);
 }
 
 void pwm::exportPwm(const char* path, size_t id){
