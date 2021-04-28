@@ -17,7 +17,7 @@ class guidance{
     void start(quiver& subject);
     //Pause task process loop
     void pause();
-    // Run task process once
+    //Run task process once
     void once(quiver& subject);
     inline void waitFinish();
     ~guidance();
@@ -31,6 +31,8 @@ class guidance{
 
 };
 
+//Call in main thread
+//Wait guidances to finish before exit
 void guidance::waitFinish(){
     taskThread.join();
 }

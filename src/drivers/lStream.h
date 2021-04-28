@@ -13,6 +13,7 @@ class lightSS{
     unsigned int getSQUAL();
 
     ~lightSS();
+    
   private:
     int _sensorFd;
     unsigned char buffer[8192];

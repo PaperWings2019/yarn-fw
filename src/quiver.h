@@ -8,11 +8,11 @@
 
 class quiver{
   public:
-    quiver(pwm& _lhsPWM, pwm& _rhsPWM);
+    quiver(pwm& lhsPWM, pwm& rhsPWM);
 
-    unsigned int speed(unsigned int);
+    unsigned int speed(unsigned int v);
 
-    void yaw(int dir);
+    void yaw(int diff);
     void forth();
 
   private:
@@ -21,4 +21,6 @@ class quiver{
     pwm& _rhsPWM;
     unsigned int cur_speed;
     unsigned int def_speed;
+
+    static constexpr unsigned int dutyMed = 50;
 };
