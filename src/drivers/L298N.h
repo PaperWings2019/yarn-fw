@@ -55,8 +55,8 @@ void L298N::lhsCW(){
 }
 
 void L298N::rhsCW(){
-    _lhsIN1.set_value(1);
-    _lhsIN2.set_value(0);
+    _rhsIN1.set_value(1);
+    _rhsIN2.set_value(0);
 }
 
 void L298N::lhsCCW(){
