@@ -29,7 +29,8 @@ class pwm{
 
     ~pwm();
     
-    static void exportPwm(const char* path, size_t id);
+    static void exportPwm(const std::string& path, size_t id);
+
   private:
     const int dutyFd;
     const int perdFd;
@@ -39,12 +40,19 @@ class pwm{
 
 void pwm::highTnSec(unsigned int time){
     std::array<char, 16> str;
-    std::to_chars(str.data(), str.data() + str.size(), time);
-    write(dutyFd, str.data(), 16);
+    char* strBeg = str.data();
+    auto [ptr, e] = std::to_chars(strBeg, strBeg + str.size(), time);
+    if(write(dutyFd, strBeg, ptr - strBeg) < 0){
+        throw std::runtime_error(strerror(errno));
+    }
 }
 
 void pwm::perdTnSec(unsigned int perd){
+    period = perd;
     std::array<char, 16> str;
-    std::to_chars(str.data(), str.data() + str.size(), period);
-    write(period, str.data(), 16);
+    char* strBeg = str.data();
+    auto [ptr, e] = std::to_chars(strBeg, strBeg + str.size(), perd);
+    if(write(perdFd, strBeg, ptr - strBeg) < 0){
+        throw std::runtime_error(strerror(errno));
+    }
 }
