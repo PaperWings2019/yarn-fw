@@ -1,12 +1,16 @@
 #include <string>
 #include "color.h"
 
-color::color(const std::string& path):
+color::color(const std::string& path, int upperThre = 1500, int loweThre = 100):
     redRaw(open((path + "in_intensity_red_raw").c_str(), O_WRONLY)),
     blueRaw(open((path + "in_intensity_blue_raw").c_str(), O_WRONLY)),
-    greenRaw(open((path + "in_intensity_green_raw").c_str(), O_WRONLY)){
-    if(redRaw < 0 || blueRaw < 0 || greenRaw < 0){
-        throw std::runtime_error(strerror(errno));
+    greenRaw(open((path + "in_intensity_green_raw").c_str(), O_WRONLY)),
+    upperThreshold(open((path + "events/in_intensity_clear_thresh_rising_value").c_str(), O_WRONLY)),
+    lowerThreshold(open((path + "events/in_intensity_clear_thresh_falling_value").c_str(), O_WRONLY)),
+    enable(open((path + "events/in_intensity_clear_thresh_either_en").c_str(), O_WRONLY)),
+    marginPeriod(open((path + "events/in_intensity_clear_thresh_either_en").c_str(), O_WRONLY)){
+    if(redRaw < 0 || blueRaw < 0 || greenRaw < 0 || upperThreshold < 0 || lowerThreshold < 0 || enable < 0 || marginPeriod < 0){
+        throw std::runtime_error("Error when opening TCS34725"s + strerror(errno));
     }
 }
 
@@ -27,10 +31,44 @@ void color::flipPattern(){
     pattern = ~pattern;
 }
 
+void color::enableInt(int upperThre, int lowerThre, size_t period){
+    std::array<char, 3> str1;
+    std::array<char, 3> str2;
+    std::array<char, 3> str3;
+    char* strBeg1 = str1.data();
+    char* strBeg2 = str2.data();
+    char* strBeg3 = str3.data();
+    auto [ptr1, e1] = std::to_chars(strBeg1, strBeg1 + str1.size(), upperThre);
+    auto [ptr2, e2] = std::to_chars(strBeg2, strBeg2 + str2.size(), lowerThre);
+    auto [ptr3, e3] = std::to_chars(strBeg3, strBeg3 + str3.size(), period);
+    if (write(upperThreshold, strBeg1, ptr1 - strBeg1) < 0){
+        throw std::runtime_error("Error when writing upper threshold"s + strerror(errno));
+    };
+    if (write(lowerThreshold, strBeg2, ptr2 - strBeg2) < 0){
+        throw std::runtime_error("Error when writing lower threshold"s + strerror(errno));
+    };
+    if (write(marginPeriod, strBeg3, ptr3 - strBeg3) < 0){
+        throw std::runtime_error("Error when writing margin period"s + strerror(errno));
+    };
+    if (write(enable, "1", 2) < 0){
+        throw std::runtime_error("Error when enabling TCS34725 Interrupt"s + strerror(errno));
+    };
+}
+
+void color::disableInt(){
+    if (write(enable, "0", 2) < 0){
+        throw std::runtime_error("Error when disabling TCS34725 Interrupt"s + strerror(errno));
+    }
+}
+
 color::~color(){
     close(redRaw);
     close(greenRaw);
     close(blueRaw);
+    close(upperThreshold);
+    close(lowerThreshold);
+    close(enable);
+    close(marginPeriod);
 }
 
 color::color_set color::decideColor(const color::RGB& C){

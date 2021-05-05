@@ -14,10 +14,14 @@
 #include <array>
 #include <charconv>
 #include <algorithm>
+#include <stdlib.h>
+#include <math.h>
+
+using std::literals::string_literals::operator ""s;
 
 class color{
     public:
-        color(const std::string& path);
+        color(const std::string& path, int upperThre, int lowerThre);
         enum color_set {
             GREEN,
             BLUE,
@@ -31,6 +35,8 @@ class color{
         RGB getData();
         void flipPattern();
         color_set decideColor(const color::RGB& C);
+        void enableInt(int upperThre, int lowerThre, size_t period);
+        void disableInt();
         ~color();
         
         
@@ -40,5 +46,8 @@ class color{
         const int redRaw;
         const int blueRaw;
         const int greenRaw;
-        
+        const int upperThreshold;
+        const int lowerThreshold;
+        const int enable;
+        const int marginPeriod;
 };
