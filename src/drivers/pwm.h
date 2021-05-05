@@ -14,6 +14,9 @@
 #include <stdexcept>
 #include <array>
 #include <charconv>
+#include <string>
+
+using std::literals::string_literals::operator ""s;
 
 class pwm{
   public:
@@ -43,7 +46,7 @@ void pwm::highTnSec(unsigned int time){
     char* strBeg = str.data();
     auto [ptr, e] = std::to_chars(strBeg, strBeg + str.size(), time);
     if(write(dutyFd, strBeg, ptr - strBeg) < 0){
-        throw std::runtime_error(strerror(errno));
+        throw std::runtime_error("Error when setting period"s + strerror(errno));
     }
 }
 
@@ -53,6 +56,6 @@ void pwm::perdTnSec(unsigned int perd){
     char* strBeg = str.data();
     auto [ptr, e] = std::to_chars(strBeg, strBeg + str.size(), perd);
     if(write(perdFd, strBeg, ptr - strBeg) < 0){
-        throw std::runtime_error(strerror(errno));
+        throw std::runtime_error("Error when setting duty cycle"s + strerror(errno));
     }
 }

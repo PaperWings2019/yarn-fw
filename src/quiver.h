@@ -2,23 +2,24 @@
 * quiver: class quiver controller
 * SdtElectronics 2021.3
 */
+
 #pragma once
 
-#include "drivers/pwm.h"
+#include "drivers/L298N.h"
 
 class quiver{
   public:
-    quiver(pwm& lhsPWM, pwm& rhsPWM);
+    quiver(L298N& dev);
 
-    unsigned int speed(unsigned int v);
+    void speed(int v);
 
     void yaw(int diff);
     void forth();
+    void spin(int diff);
 
   private:
+    L298N& _dev;
 
-    pwm& _lhsPWM;
-    pwm& _rhsPWM;
     unsigned int cur_speed;
     unsigned int def_speed;
 
